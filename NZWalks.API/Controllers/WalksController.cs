@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using NZWalks.API.Models.DTO;
 using NZWalks.API.Models.Domain;
 using NZWalks.API.Repositories;
+using NZWalks.API.CustomActionFilters;
 
 namespace NZWalks.API.Controllers
 {
@@ -21,21 +22,14 @@ namespace NZWalks.API.Controllers
 
 
         [HttpPost]
+        [ValidateModel]
         public async Task<IActionResult> CreateWalk([FromBody] AddWalkDto addWalkDto)
         {
-            if (ModelState.IsValid)
-            {
+            var walkDomainModel = mapper.Map<Walk>(addWalkDto);
+            await walkRepository.AddWalkAsync(walkDomainModel);
+            var walkDtoMap = mapper.Map<WalkDto>(walkDomainModel);
 
-                var walkDomainModel = mapper.Map<Walk>(addWalkDto);
-                await walkRepository.AddWalkAsync(walkDomainModel);
-                var walkDtoMap = mapper.Map<WalkDto>(walkDomainModel);
-
-                return Ok(walkDtoMap);
-            }
-            else
-            {
-                return BadRequest(ModelState);
-            }
+            return Ok(walkDtoMap);
         }
 
         [HttpGet]
@@ -75,25 +69,18 @@ namespace NZWalks.API.Controllers
 
         [HttpPut]
         [Route("{id:Guid}")]
+        [ValidateModel]
         public async Task<IActionResult> updateTask([FromRoute] Guid id, [FromBody] UpdateWalkDto updateDto)
         {
-            if (ModelState.IsValid)
-            {
-                var walkDomain = mapper.Map<Walk>(updateDto);
+            var walkDomain = mapper.Map<Walk>(updateDto);
 
-                var walkDomainUpdated = await walkRepository.updateWalkAsync(id, walkDomain);
-                if (walkDomainUpdated == null)
-                {
-                    return NotFound();
-                }
-
-                return Ok(mapper.Map<UpdateWalkDto>(walkDomainUpdated));
-            }
-            else
+            var walkDomainUpdated = await walkRepository.updateWalkAsync(id, walkDomain);
+            if (walkDomainUpdated == null)
             {
-                return BadRequest(ModelState);
+                return NotFound();
             }
 
+            return Ok(mapper.Map<UpdateWalkDto>(walkDomainUpdated));
         }
     }
 }
