@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using NZWalks.API.Models.Domain;
 
 namespace NZWalks.API.Data
@@ -70,7 +71,32 @@ namespace NZWalks.API.Data
 
             // Add-Migration "comment"
             // Update-Database
-        }
 
+
+
+            //seed data for roles and users
+            var readerRoleId = "f0571c7a-9d14-48c2-ad57-d08430d9e358";
+            var writerRoleId = "8e209f7d-2358-44f1-8623-86684bf3081b";
+
+            var roles = new List<IdentityRole>
+            {
+                new IdentityRole
+                {
+                    Id = readerRoleId,
+                    ConcurrencyStamp = readerRoleId,
+                    Name = "Reader",
+                    NormalizedName = "Reader".ToUpper()
+                },
+                new IdentityRole
+                {
+                    Id = writerRoleId,
+                    ConcurrencyStamp = writerRoleId,
+                    Name = "Writer",
+                    NormalizedName = "Writer".ToUpper()
+                }
+            }; ;
+
+            modelBuilder.Entity<IdentityRole>().HasData(roles);
+        }
     }
 }
