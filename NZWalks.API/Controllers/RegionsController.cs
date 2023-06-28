@@ -10,7 +10,6 @@ namespace NZWalks.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
     public class RegionsController : ControllerBase
     {
         private readonly IRegionRepository regionRepository;
@@ -23,6 +22,7 @@ namespace NZWalks.API.Controllers
 
         //GET ALL REGIONS
         [HttpGet]
+        [Authorize(Roles = "Reader, Writer")]
         public async Task<IActionResult> GetAll()
         {
             // Get data from Database - Domain Models
@@ -50,6 +50,7 @@ namespace NZWalks.API.Controllers
         //GET SINGLE REGION BY ID
         [HttpGet]
         [Route("{id:Guid}")]
+        [Authorize(Roles = "Reader, Writer")]
         public async Task<IActionResult> GetById([FromRoute] Guid id)
         {
             //var region = dbContext.Regions.Find(id); same as down, the only difference between is that this one only filter by ID
@@ -76,6 +77,7 @@ namespace NZWalks.API.Controllers
         //Crate a new region
         [HttpPost]
         [ValidateModel]
+        [Authorize(Roles = "Writer")]
         public async Task<IActionResult> CreateRegion([FromBody] AddRegionDto addRegionRequestDto)
         {
             //Map or connvert DTO To domain Model
@@ -106,6 +108,7 @@ namespace NZWalks.API.Controllers
         [HttpPut]
         [Route("{id:Guid}")]
         [ValidateModel]
+        [Authorize(Roles = "Writer")]
         public async Task<IActionResult> UpdateRegion([FromBody] AddRegionDto updateRegionDto, [FromRoute] Guid id)
         {
             //MAP DTO to Domain Model
@@ -139,6 +142,7 @@ namespace NZWalks.API.Controllers
 
         [HttpDelete]
         [Route("{id:Guid}")]
+        [Authorize(Roles = "Writer")]
         public async Task<IActionResult> deleteRegion([FromRoute] Guid id)
         {
             var regionDomain = await regionRepository.DeleteRegion(id);
