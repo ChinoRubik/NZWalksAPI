@@ -68,6 +68,7 @@ namespace NZWalks.API.Controllers
                         var response = new LoginResponseDto
                         {
                             Token = jwtToken,
+                            NameUser = user.UserName,
                         };
 
                         return Ok(response);
