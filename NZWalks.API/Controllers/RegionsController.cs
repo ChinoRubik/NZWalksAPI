@@ -5,6 +5,7 @@ using NZWalks.API.CustomActionFilters;
 using NZWalks.API.Models.Domain;
 using NZWalks.API.Models.DTO;
 using NZWalks.API.Repositories;
+using System.Security.Claims;
 
 namespace NZWalks.API.Controllers
 {
@@ -14,10 +15,13 @@ namespace NZWalks.API.Controllers
     {
         private readonly IRegionRepository regionRepository;
         private readonly IMapper mapper;
-        public RegionsController(IRegionRepository regionRepository, IMapper mapper)
+        private readonly ILogger<RegionsController> logger;
+
+        public RegionsController(IRegionRepository regionRepository, IMapper mapper, ILogger<RegionsController> logger)
         {
             this.regionRepository = regionRepository;
             this.mapper = mapper;
+            this.logger = logger;
         }
 
         //GET ALL REGIONS
@@ -26,24 +30,12 @@ namespace NZWalks.API.Controllers
         public async Task<IActionResult> GetAll()
         {
             // Get data from Database - Domain Models
+            var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            logger.LogInformation($"Get all Regions Action method was invoked, userid = {userId}");
             var regionsDomain = await regionRepository.GetAllAsync();
 
-            // Map domain models to DTOs (DATA TRANSFORM OBJECT)
-
-            //var regionsDto = new List<RegionDto>();
-            //foreach (var region in regionsDomain)
-            //{
-            //    regionsDto.Add(new RegionDto()
-            //    {
-            //        Id = region.Id,
-            //        Code = region.Code,
-            //        Name = region.Name,
-            //    });
-            //}
-
-            //Instead for all regiosDomain to pass it to regionsDto, we can Map and do it in one line
             var regionsDto = mapper.Map<List<RegionDto>>(regionsDomain);
-
+            
             return Ok(regionsDto);
         }
 
